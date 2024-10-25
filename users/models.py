@@ -16,8 +16,7 @@ class Profile(models.Model):
     location = models.CharField(max_length=200, blank=True, null=True, default="Earth")
     short_intro = models.CharField(max_length=200, blank=True, null=True, default="This is a default bio. User has not added a bio yet.")
     bio = models.TextField(blank=True, null=True)
-    profile_image = models.ImageField(
-        null=True, blank=True, upload_to='profiles/', default="profiles/user-default.png")
+    profile_image = models.CharField(max_length=2000,default="https://bxboavniaetazfvskxln.supabase.co/storage/v1/object/sign/devsearch-default/user-default.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJkZXZzZWFyY2gtZGVmYXVsdC91c2VyLWRlZmF1bHQucG5nIiwiaWF0IjoxNzI5ODY2MDU2LCJleHAiOjMzMDY2NjYwNTZ9.rISieoKeFQPFOFObgx6fzlkWxp5Ef0oTprEmbg5fNCc&t=2024-10-25T14%3A20%3A55.434Z")
     social_github = models.CharField(max_length=200, blank=True, null=True)
     social_twitter = models.CharField(max_length=200, blank=True, null=True)
     social_linkedin = models.CharField(max_length=200, blank=True, null=True)
@@ -33,15 +32,6 @@ class Profile(models.Model):
     class Meta:
         ordering = ['created']
 
-    @property
-    def imageURL(self):
-        try:
-            url = self.profile_image.url
-        except:
-            url = ''
-        return url
-
-
 class Skill(models.Model):
     owner = models.ForeignKey(
         Profile, on_delete=models.CASCADE, null=True, blank=True)
@@ -50,7 +40,6 @@ class Skill(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True,
                           primary_key=True, editable=False)
-
     def __str__(self):
         return str(self.name)
 

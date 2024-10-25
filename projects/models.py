@@ -11,8 +11,7 @@ class Project(models.Model):
         Profile, null=True, blank=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    featured_image = models.ImageField(
-        null=True, blank=True, default="default.jpg")
+    featured_image = models.CharField(max_length=2000, null=True, blank=True, default="https://bxboavniaetazfvskxln.supabase.co/storage/v1/object/sign/devsearch-default/project-default.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJkZXZzZWFyY2gtZGVmYXVsdC9wcm9qZWN0LWRlZmF1bHQuanBnIiwiaWF0IjoxNzI5ODY2MjE3LCJleHAiOjMzMDY2NjYyMTd9.xPVSBjTzb1xVuPWXBXSaM08bzq7C6SBfoCa_HAG9Cx4&t=2024-10-25T14%3A23%3A36.186Z")
     demo_link = models.CharField(max_length=2000, null=True, blank=True)
     source_link = models.CharField(max_length=2000, null=True, blank=True)
     tags = models.ManyToManyField('Tag', blank=True)
@@ -29,14 +28,6 @@ class Project(models.Model):
         ordering = ['-vote_ratio', '-vote_total', 'title']
 
     @property
-    def imageURL(self):
-        try:
-            url = self.featured_image.url
-        except:
-            url = ''
-        return url
-
-    @property
     def reviewers(self):
         queryset = self.review_set.all().values_list('owner__id', flat=True)
         return queryset
@@ -50,7 +41,6 @@ class Project(models.Model):
         ratio = (upVotes / totalVotes) * 100
         self.vote_total = totalVotes
         self.vote_ratio = ratio
-
         self.save()
 
 

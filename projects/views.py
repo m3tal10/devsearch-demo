@@ -6,12 +6,13 @@ from django.contrib import messages
 from .models import Project, Tag
 from .forms import ProjectForm, ReviewForm
 from .utils import searchProjects, paginateProjects
+import os
+import requests
 
 
 def projects(request):
     projects, search_query = searchProjects(request)
     custom_range, projects = paginateProjects(request, projects, 6)
-
     context = {'projects': projects,
                'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'projects/projects.html', context)
@@ -40,18 +41,24 @@ def project(request, pk):
 def createProject(request):
     profile = request.user.profile
     form = ProjectForm()
-
     if request.method == 'POST':
         newtags = request.POST.get('newtags').replace(',',  " ").split()
-        form = ProjectForm(request.POST, request.FILES)
+        form = ProjectForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
             project.owner = profile
             project.save()
-
             for tag in newtags:
                 tag, created = Tag.objects.get_or_create(name=tag)
                 project.tags.add(tag)
+            if request.FILES:
+                image= request.FILES['featured_image'].read()
+                headers={'Authorization': f"Client-ID {os.environ.get('IMGUR_CLIENT')}"}
+                data = {'image': image, 'type': 'file'}
+                response=  requests.post("https://api.imgur.com/3/upload", headers=headers, files={'image': image})
+                imgur_link = response.json()['data']['link']
+                project.featured_image=imgur_link
+                project.save()
             return redirect('account')
 
     context = {'form': form}
@@ -67,13 +74,20 @@ def updateProject(request, pk):
     if request.method == 'POST':
         newtags = request.POST.get('newtags').replace(',',  " ").split()
 
-        form = ProjectForm(request.POST, request.FILES, instance=project)
+        form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             project = form.save()
             for tag in newtags:
                 tag, created = Tag.objects.get_or_create(name=tag)
                 project.tags.add(tag)
-
+            if request.FILES:
+                image= request.FILES['featured_image'].read()
+                headers={'Authorization': f"Client-ID {os.environ.get('IMGUR_CLIENT')}"}
+                data = {'image': image, 'type': 'file'}
+                response=  requests.post("https://api.imgur.com/3/upload", headers=headers, files={'image': image})
+                imgur_link = response.json()['data']['link']
+                project.featured_image=imgur_link
+                project.save()
             return redirect('account')
 
     context = {'form': form, 'project': project}

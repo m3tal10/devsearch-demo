@@ -9,6 +9,12 @@ from django.db.models import Q
 from .models import Profile, Message
 from .forms import CustomUserCreationForm, ProfileForm, SkillForm, MessageForm
 from .utils import searchProfiles, paginateProfiles
+import pyimgur
+import os
+import requests
+
+
+
 
 def loginUser(request):
     page = 'login'
@@ -93,7 +99,6 @@ def userAccount(request):
 
     skills = profile.skill_set.all()
     projects = profile.project_set.all()
-
     context = {'profile': profile, 'skills': skills, 'projects': projects}
     return render(request, 'users/account.html', context)
 
@@ -102,13 +107,20 @@ def userAccount(request):
 def editAccount(request):
     profile = request.user.profile
     form = ProfileForm(instance=profile)
-
+    client_id = os.environ.get('IMGUR_CLIENT')
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        form = ProfileForm(request.POST,instance=profile)
         if form.is_valid():
-            form.save()
-
-            return redirect('account')
+            profile=form.save()
+        if request.FILES:
+            headers = {'Authorization': f'Client-ID {client_id}'}
+            image=request.FILES['profile_image'].read()
+            data = {'image': image, 'type': 'file'}
+            response=  requests.post("https://api.imgur.com/3/upload", headers=headers, files={'image': image})
+            imgur_link = response.json()['data']['link']
+            profile.profile_image=imgur_link
+            profile.save()
+        return redirect('account')
 
     context = {'form': form}
     return render(request, 'users/profile_form.html', context)

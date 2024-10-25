@@ -12,6 +12,7 @@ class ProjectForm(ModelForm):
         widgets = {
             'tags': forms.CheckboxSelectMultiple(),
         }
+    featured_image=forms.ImageField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
