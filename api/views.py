@@ -62,5 +62,4 @@ def removeTag(request):
     tag = Tag.objects.get(id=tagId)
 
     project.tags.remove(tag)
-
     return Response('Tag was deleted!')
