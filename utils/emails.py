@@ -3,8 +3,7 @@ from django.conf import settings
 import os
 class Email():
     def __init__(self):
-        self.email_from = os.getenv('EMAIL_FROM')
-        # self.email_from = settings.EMAIL_HOST_USER
+        self.email_from = settings.DEFAULT_FROM_EMAIL
 
     def send_welcome_email(self,user_email):
         subject = 'Welcome to DevSearch'
