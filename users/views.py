@@ -13,9 +13,6 @@ import pyimgur
 import os
 import requests
 
-
-
-
 def loginUser(request):
     page = 'login'
 
@@ -197,7 +194,6 @@ def viewMessage(request, pk):
 def createMessage(request, pk):
     recipient = Profile.objects.get(id=pk)
     form = MessageForm()
-
     try:
         sender = request.user.profile
     except:
