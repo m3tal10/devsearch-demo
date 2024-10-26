@@ -5,11 +5,6 @@ profiles = [
         "description": "I'm a full stack web developer who probably spends too much time coding. A core contribute to the Mumble project and online instructor."
     },
     {
-        "id": "2",
-        "name": "Dennis Ivy",
-        "description": "I build new projects just to tickle my brain and love teaching others how they're made. While I keep busy teaching courses, I still take interviews in search of a great team & projects that interest me."
-    },
-    {
         "id": "3",
         "name": "Mehdi",
         "description": " I am a Full-Stack Developer.  I am Currently learning, working my skills in web development. Open source enthusiast"
