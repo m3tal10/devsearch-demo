@@ -41,11 +41,22 @@ INSTALLED_APPS = [
 
     'projects.apps.ProjectsConfig',
     'users.apps.UsersConfig',
+    'chat.apps.ChatConfig',
+
 
     'rest_framework',
     'corsheaders',
-    'storages'
+    'storages',
+    'channels',
 ]
+
+ASGI_APPLICATION = 'devsearch.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
