@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
 
@@ -20,4 +20,5 @@ urlpatterns = [
     path('inbox/', views.inbox, name="inbox"),
     path('message/<str:pk>/', views.viewMessage, name="message"),
     path('create-message/<str:pk>/', views.createMessage, name="create-message"),
+    path('chats/', include('chat.urls'))
 ]

@@ -203,7 +203,6 @@ def createMessage(request, pk):
             message = form.save(commit=False)
             message.sender = sender
             message.recipient = recipient
-
             if sender:
                 message.name = sender.name
                 message.email = sender.email

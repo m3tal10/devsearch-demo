@@ -1,0 +1,66 @@
+{% extends 'main.html' %}
+
+
+{% block content %}
+<!-- Main Section -->
+<main class="messagePage my-xl">
+  {%if messages%}
+  <div class="content-box">
+    <div class="message">
+      <a class="backButton" href="{% url 'inbox' %}"><i class="im im-angle-left"></i></a>
+      <h2 class="message__subject">{{message.subject}}</h4>
+        {% if message.sender %}
+        <a href="{% url 'user-profile' message.sender.id  %}" class="message__author">{{message.name}}</a>
+        {% else %}
+        <p class="message__author">{{message.name}}</p>
+        {% endif %}
+        <p class="message__date">{{message.created}}</p>
+        <div class="message__body">{{message.body|linebreaksbr}}</div>
+    </div>
+  </div>
+  {%endif%}
+  <form>
+    {%csrf_token%}
+    <div class="form__field">
+      {{form.content}}
+    </div>
+  </form>
+  {{ room_name|json_script:"room-name" }}
+  <script>
+    const room_name = JSON.parse(
+      document.getElementById("room-name").textContent
+    );
+    const chatSocket = new WebSocket(
+      "ws://" + window.location.host + "/ws/chats/" + room_name + "/"
+    );
+
+    chatSocket.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      document.querySelector("#chat-log").value += data.message + "\n";
+    };
+
+    chatSocket.onclose = function (e) {
+      console.error("Chat socket closed unexpectedly");
+    };
+
+    document.querySelector("#chat-message-input").focus();
+    document.querySelector("#chat-message-input").onkeyup = function (e) {
+      if (e.key === "Enter") {
+        // enter, return
+        document.querySelector("#chat-message-submit").click();
+      }
+    };
+
+    document.querySelector("#chat-message-submit").onclick = function (e) {
+      const messageInputDom = document.querySelector("#chat-message-input");
+      const message = messageInputDom.value;
+      chatSocket.send(
+        JSON.stringify({
+          message: message,
+        })
+      );
+      messageInputDom.value = "";
+    };
+  </script>
+</main>
+{% endblock content %}

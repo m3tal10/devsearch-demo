@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,16 +48,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'storages',
-    'channels',
 ]
 
-ASGI_APPLICATION = 'devsearch.asgi.application'
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -224,6 +217,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 # AWS_STORAGE_BUCKET_NAME = 'devsearch-bucket'
 
-
+ASGI_APPLICATION = 'devsearch.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        "CONFIG":{
+            'hosts':[(f"redis://default:Vyv7EvJfDsf2YeAccfDLzUISs5XgWltd@redis-15964.c264.ap-south-1-1.ec2.redns.redis-cloud.com:15964/0")]
+        }
+    },
+}
 if os.getcwd() == '/app':
     DEBUG = False

@@ -57,7 +57,7 @@
             </ul>
             {% if request.user.profile.id != profile.id %}
             <a
-              href="{% url 'create-message' profile.id %}"
+              href="{% url 'chats/chat-message' profile.id %}"
               class="btn btn--sub btn--lg"
               >Send Message
             </a>
