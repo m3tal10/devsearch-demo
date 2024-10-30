@@ -1,66 +1,98 @@
-{% extends 'main.html' %}
-
-
-{% block content %}
+{% extends 'main.html' %} {% block content %}
 <!-- Main Section -->
 <main class="messagePage my-xl">
-  {%if messages%}
   <div class="content-box">
+    {%if messages%}
     <div class="message">
-      <a class="backButton" href="{% url 'inbox' %}"><i class="im im-angle-left"></i></a>
-      <h2 class="message__subject">{{message.subject}}</h4>
-        {% if message.sender %}
-        <a href="{% url 'user-profile' message.sender.id  %}" class="message__author">{{message.name}}</a>
-        {% else %}
-        <p class="message__author">{{message.name}}</p>
-        {% endif %}
-        <p class="message__date">{{message.created}}</p>
-        <div class="message__body">{{message.body|linebreaksbr}}</div>
+      <a class="backButton" href="{% url 'inbox' %}"
+        ><i class="im im-angle-left"></i
+      ></a>
+      {% if message.sender %}
+      <a
+        href="{% url 'user-profile' message.sender.id  %}"
+        class="message__author"
+        >{{message.name}}</a
+      >
+      {% else %}
+      <p class="message__author">{{message.name}}</p>
+      {% endif %}
+      <p class="message__date">{{message.created}}</p>
+      <div class="message__body">{{message.body|linebreaksbr}}</div>
     </div>
+    {%endif%}
   </div>
-  {%endif%}
-  <form>
-    {%csrf_token%}
-    <div class="form__field">
-      {{form.content}}
-    </div>
+
+  <form class="chat-form" onsubmit="handleChatSubmit(event)">
+    <div class="form__field">{{form.content}}</div>
+    <button class="chat-message-submit" type="submit">send</button>
+    <p class="test">test</p>
   </form>
-  {{ room_name|json_script:"room-name" }}
+  {{ room_name|json_script:"room-name" }} {{ sender|json_script:"sender" }}
+
   <script>
-    const room_name = JSON.parse(
+    let room_name = JSON.parse(
       document.getElementById("room-name").textContent
-    );
+    ).split("_");
+    const sender_name = room_name[1];
+    room_name = room_name.sort().join("_");
+    const sender = JSON.parse(document.getElementById("sender").textContent);
     const chatSocket = new WebSocket(
       "ws://" + window.location.host + "/ws/chats/" + room_name + "/"
     );
 
     chatSocket.onmessage = function (e) {
       const data = JSON.parse(e.data);
-      document.querySelector("#chat-log").value += data.message + "\n";
+      const messageDiv = document.createElement("div");
+      let author;
+      if (sender_name === data.sender) {
+        author = document.createElement("p");
+        messageDiv.classList.add("sender");
+      } else {
+        author = document.createElement("a");
+        messageDiv.classList.add("receiver");
+      }
+      author.classList.add("message__author");
+      messageDiv.classList.add("message");
+      const messageNode = document.createTextNode(data.message);
+      const senderNode =
+        sender_name === data.sender
+          ? document.createTextNode("You")
+          : document.createTextNode(data.sender);
+      author.appendChild(senderNode);
+      messageDiv.appendChild(author);
+      messageDiv.appendChild(messageNode);
+      document.querySelector(".content-box").appendChild(messageDiv);
     };
 
     chatSocket.onclose = function (e) {
       console.error("Chat socket closed unexpectedly");
     };
 
-    document.querySelector("#chat-message-input").focus();
-    document.querySelector("#chat-message-input").onkeyup = function (e) {
-      if (e.key === "Enter") {
-        // enter, return
-        document.querySelector("#chat-message-submit").click();
-      }
-    };
-
-    document.querySelector("#chat-message-submit").onclick = function (e) {
-      const messageInputDom = document.querySelector("#chat-message-input");
-      const message = messageInputDom.value;
+    document.querySelector(".chat-message").focus();
+    // document.querySelector(".chat-message").onkeyup = function (e) {
+    //   e.preventDefault();
+    //   if (e.key === "Enter") {
+    //     // enter, return
+    //     submitButton = document.querySelector(".chat-message-submit");
+    //     submitButton.click();
+    //   }
+    // };
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const messageInputDom = document.querySelector(".chat-message");
+      const content = messageInputDom.value;
       chatSocket.send(
         JSON.stringify({
-          message: message,
+          content,
+          room_name,
+          sender,
         })
       );
       messageInputDom.value = "";
-    };
+    }
+    // document.querySelector(".chat-form").onSubmit = function (e) {
+
+    // };
   </script>
 </main>
 {% endblock content %}
