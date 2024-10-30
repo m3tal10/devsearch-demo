@@ -36,8 +36,9 @@
     const sender_name = room_name[1];
     room_name = room_name.sort().join("_");
     const sender = JSON.parse(document.getElementById("sender").textContent);
+    const protocol = window.location.protocol === "https" ? "wss://" : "ws://";
     const chatSocket = new WebSocket(
-      "ws://" + window.location.host + "/ws/chats/" + room_name + "/"
+      protocol + window.location.host + "/ws/chats/" + room_name + "/"
     );
 
     chatSocket.onmessage = function (e) {
