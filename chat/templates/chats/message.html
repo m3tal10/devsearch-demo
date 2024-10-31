@@ -1,32 +1,35 @@
+<!-- prettier-ignore -->
 {% extends 'main.html' %} {% block content %}
 <!-- Main Section -->
 <main class="messagePage my-xl">
   <div class="content-box">
-    {%if messages%}
-    <div class="message">
-      <a class="backButton" href="{% url 'inbox' %}"
-        ><i class="im im-angle-left"></i
-      ></a>
-      {% if message.sender %}
-      <a
-        href="{% url 'user-profile' message.sender.id  %}"
-        class="message__author"
-        >{{message.name}}</a
-      >
+    <div class="text-messages">
+      {% for message in messages %}
+      {% if message.sender.username == sender_profile.username %}
+        <div class="sender message-div">
+          <div class="message-body">{{message.message|linebreaksbr}}</div>
+          <p class="message-date">{{message.created_at}}</p> 
+        </div>
       {% else %}
-      <p class="message__author">{{message.name}}</p>
+        <div class="receiver message-div">
+          <a
+            href="{% url 'user-profile' message.sender.profile.id  %}"
+            class="message-author"
+            >{{message.sender.username}}
+          </a>
+          <div class="message-body">{{message.message|linebreaksbr}}</div>
+          <p class="message-date">{{message.created_at}}</p>
+        </div>
       {% endif %}
-      <p class="message__date">{{message.created}}</p>
-      <div class="message__body">{{message.body|linebreaksbr}}</div>
+    {% endfor %}
     </div>
-    {%endif%}
+      <form class="chat-form" onsubmit="handleChatSubmit(event)">
+        {{form.message}}
+        <button class="chat-message-submit" type="submit">send</button>
+      </form>
   </div>
-
-  <form class="chat-form" onsubmit="handleChatSubmit(event)">
-    <div class="form__field">{{form.content}}</div>
-    <button class="chat-message-submit" type="submit">send</button>
-    <p class="test">test</p>
-  </form>
+  
+  
   {{ room_name|json_script:"room-name" }} {{ sender|json_script:"sender" }}
 
   <script>
@@ -37,8 +40,6 @@
     room_name = room_name.sort().join("_");
     const sender = JSON.parse(document.getElementById("sender").textContent);
     const protocol = window.location.protocol === "http:" ? "ws://" : "wss://";
-    console.log(window.location.protocol);
-    console.log(protocol);
     const chatSocket = new WebSocket(
       protocol + window.location.host + "/ws/chats/" + room_name + "/"
     );
@@ -46,32 +47,46 @@
     chatSocket.onmessage = function (e) {
       const data = JSON.parse(e.data);
       const messageDiv = document.createElement("div");
-      let author;
-      if (sender_name === data.sender) {
-        author = document.createElement("p");
-        messageDiv.classList.add("sender");
-      } else {
-        author = document.createElement("a");
-        messageDiv.classList.add("receiver");
-      }
-      author.classList.add("message__author");
-      messageDiv.classList.add("message");
+      const messageDate = document.createElement("p");
+      const messageBody = document.createElement("div");
       const messageNode = document.createTextNode(data.message);
+      const messageDateNode = document.createTextNode(data.created_at);
       const senderNode =
         sender_name === data.sender
           ? document.createTextNode("You")
           : document.createTextNode(data.sender);
-      author.appendChild(senderNode);
-      messageDiv.appendChild(author);
-      messageDiv.appendChild(messageNode);
-      document.querySelector(".content-box").appendChild(messageDiv);
+      let author;
+      if (sender_name === data.sender) {
+        messageDiv.classList.add("sender");
+      } else {
+        author = document.createElement("a");
+        author.setAttribute(
+          "href",
+          "{% url 'user-profile' sender_profile.id  %}"
+        );
+        author.appendChild(senderNode);
+        author.classList.add("message-author");
+        messageDiv.classList.add("receiver");
+      }
+      messageDiv.classList.add("message-div");
+      messageBody.classList.add("message-body");
+      messageDate.classList.add("message-date");
+      messageDate.appendChild(messageDateNode);
+      messageBody.appendChild(messageNode);
+      if(author){
+        messageDiv.appendChild(author);
+      }
+      messageDiv.appendChild(messageBody);
+      messageDiv.appendChild(messageDate);
+      document.querySelector(".text-messages").appendChild(messageDiv);
+      scrollToBottom()
     };
 
     chatSocket.onclose = function (e) {
       console.error("Chat socket closed unexpectedly");
     };
 
-    document.querySelector(".chat-message").focus();
+    document.querySelector(".input.chat").focus();
     // document.querySelector(".chat-message").onkeyup = function (e) {
     //   e.preventDefault();
     //   if (e.key === "Enter") {
@@ -82,7 +97,7 @@
     // };
     function handleChatSubmit(e) {
       e.preventDefault();
-      const messageInputDom = document.querySelector(".chat-message");
+      const messageInputDom = document.querySelector(".input.chat");
       const content = messageInputDom.value;
       chatSocket.send(
         JSON.stringify({
@@ -93,9 +108,11 @@
       );
       messageInputDom.value = "";
     }
-    // document.querySelector(".chat-form").onSubmit = function (e) {
-
-    // };
+    function scrollToBottom() {
+    const messageBox = document.querySelector(".text-messages");
+    messageBox.scrollTop = messageBox.scrollHeight;
+  }
+  scrollToBottom()
   </script>
 </main>
 {% endblock content %}

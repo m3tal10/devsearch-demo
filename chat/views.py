@@ -8,13 +8,17 @@ from .models import ChatMessage
 def chat_room(request,user_id):
     form= SendMessageForm()
     recipient= Profile.objects.get(id=user_id)
-    sender_name= request.user.profile.username
+    sender_name= request.user.username
     room_name= f"{recipient.username}_{sender_name}"
+    sorted_room_name= '_'.join(sorted(room_name.split('_')))
+    messages= ChatMessage.objects.filter(room_name=sorted_room_name)
 
     context={
         'recipient':recipient,
         'form':form,
         'room_name':room_name,
         'sender':request.user.id,
+        'sender_profile':request.user.profile,
+        'messages':messages,
         }
     return render(request,'chats/message.html',context)
