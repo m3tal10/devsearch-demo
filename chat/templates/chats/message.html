@@ -2,9 +2,10 @@
 {% extends 'main.html' %} {% block content %}
 <!-- Main Section -->
 <main class="messagePage my-xl">
-  <div class="content-box">
+  <div class="content-box-chat">
     <div class="text-messages">
-      {% for message in messages %}
+      <a class="backButton" href="{% url 'chat-inbox' %}"><i class="bi bi-arrow-left"></i></a>
+      {% for message in texts %}
       {% if message.sender.username == sender_profile.username %}
         <div class="sender message-div">
           <div class="message-body">{{message.message|linebreaksbr}}</div>
@@ -13,8 +14,9 @@
       {% else %}
         <div class="receiver message-div">
           <a
-            href="{% url 'user-profile' message.sender.profile.id  %}"
+            href="{% url 'user-profile' message.sender.id  %}"
             class="message-author"
+            target="_blank"
             >{{message.sender.username}}
           </a>
           <div class="message-body">{{message.message|linebreaksbr}}</div>
@@ -25,12 +27,14 @@
     </div>
       <form class="chat-form" onsubmit="handleChatSubmit(event)">
         {{form.message}}
-        <button class="chat-message-submit" type="submit">send</button>
+        <button class="chat-message-submit" type="submit"><i class="bi bi-send"></i></button>
       </form>
   </div>
   
   
-  {{ room_name|json_script:"room-name" }} {{ sender|json_script:"sender" }}
+  {{ room_name|json_script:"room-name" }} 
+  {{ sender|json_script:"sender" }} 
+  {{ recipient|json_script:"recipient" }}
 
   <script>
     let room_name = JSON.parse(
@@ -39,11 +43,12 @@
     const sender_name = room_name[1];
     room_name = room_name.sort().join("_");
     const sender = JSON.parse(document.getElementById("sender").textContent);
+    const recipient = JSON.parse(document.getElementById("recipient").textContent);
     const protocol = window.location.protocol === "http:" ? "ws://" : "wss://";
     const chatSocket = new WebSocket(
       protocol + window.location.host + "/ws/chats/" + room_name + "/"
     );
-
+    
     chatSocket.onmessage = function (e) {
       const data = JSON.parse(e.data);
       const messageDiv = document.createElement("div");
@@ -87,14 +92,7 @@
     };
 
     document.querySelector(".input.chat").focus();
-    // document.querySelector(".chat-message").onkeyup = function (e) {
-    //   e.preventDefault();
-    //   if (e.key === "Enter") {
-    //     // enter, return
-    //     submitButton = document.querySelector(".chat-message-submit");
-    //     submitButton.click();
-    //   }
-    // };
+
     function handleChatSubmit(e) {
       e.preventDefault();
       const messageInputDom = document.querySelector(".input.chat");
@@ -104,6 +102,7 @@
           content,
           room_name,
           sender,
+          recipient,
         })
       );
       messageInputDom.value = "";

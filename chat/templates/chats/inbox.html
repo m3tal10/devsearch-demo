@@ -2,21 +2,33 @@
 <!-- Main Section -->
 <main class="inbox my-xl">
   <div class="content-box">
-    <h3 class="inbox__title">New Messages(<span>{{unreadCount}}</span>)</h3>
+    <!-- <h3 class="inbox__title">New Messages(<span>{{unreadCount}}</span>)</h3> -->
 
     <ul class="messages">
-      {% for message in messageRequests %} {% if message.is_read == False %}
-      <li class="message message--unread">{% else %}</li>
-
+      {%if conversations%}
+      {% for conversation in conversations %}
       <li class="message">
+        {% if owner == conversation.sender.id %}
+        <a href="{% url 'chat-message' conversation.recipient.id %}">
+          <span class="message__author">You</span>
+        {% else%}
+        <a href="{% url 'chat-message' conversation.sender.id %}">
+          <span class="message__author">{{conversation.sender}}</span>
+        {%endif%}
+        {% if conversation.message|length > 30 %}
+        <span class="message__subject">{{conversation.message|slice:":45"}}...</span>
+        {% else %}
+        <span class="message__subject">{{conversation.message}}</span>
         {% endif %}
-        <a href="{% url 'message' message.id %}">
-          <span class="message__author">{{message.name}}</span>
-          <span class="message__subject">{{message.subject}}</span>
-          <span class="message__date">{{message.created}}</span>
+          <span class="message-date">{{conversation.created_at}}</span>
         </a>
       </li>
-      {% endfor %}
+      {%endfor%}
+      {% else %}
+      <li class="message">
+        Please start a conversation to see your messages here.
+      </li>
+      {%endif%}
     </ul>
   </div>
 </main>

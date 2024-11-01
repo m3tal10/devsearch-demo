@@ -2,7 +2,8 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from .models import ChatMessage
-from users.models import User
+from users.models import User,Profile
+from datetime import timedelta
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -21,21 +22,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['content']
-        sender= await sync_to_async(User.objects.get)(id= text_data_json['sender'])
-        user_profile = await sync_to_async(lambda: sender.profile)()
+        sender= await sync_to_async(Profile.objects.get)(id= text_data_json['sender'])
+        recipient= await sync_to_async(Profile.objects.get)(id= text_data_json['recipient'])
         new_message = await sync_to_async(ChatMessage.objects.create)(
             message= message,
             sender= sender,
-            room_name= text_data_json['room_name']
+            room_name= text_data_json['room_name'],
+            recipient= recipient,
         )
-
+        new_created_at= new_message.created_at+ timedelta(hours=6)
+        formatted_created_at = new_created_at.strftime('%b. %d, %Y, %I:%M %p')
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
                 'message': message,
-                'sender': user_profile.username,
-                'created_at': str(new_message.created_at)
+                'sender': sender.username,
+                'created_at': formatted_created_at
             }
         )
     async def chat_message(self, event):

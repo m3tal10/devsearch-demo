@@ -101,6 +101,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'devsearch.middleware.TimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'devsearch.urls'
@@ -172,7 +173,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Etc/GMT-6'
 
 USE_I18N = True
 
@@ -222,7 +223,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         "CONFIG":{
-            'hosts':[(f"redis://default:Vyv7EvJfDsf2YeAccfDLzUISs5XgWltd@redis-15964.c264.ap-south-1-1.ec2.redns.redis-cloud.com:15964/0")]
+            'hosts':[(f"redis://default:{os.environ.get('REDIS_PASSWORD')}@redis-15964.c264.ap-south-1-1.ec2.redns.redis-cloud.com:15964/0")]
         }
     },
 }
