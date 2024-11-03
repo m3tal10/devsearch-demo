@@ -1,18 +1,17 @@
-version: '3.8'
-
 services:
   web:
     build: .
-    command: gunicorn --bind 0.0.0.0:8000 devsearch.wsgi:application
+    command: gunicorn --bind 0.0.0.0:8000 devsearch.asgi:application
     volumes:
-      - .:/devsearch
+      - .:/app
     ports:
       - "8000:8000"
     env_file:
       - .env
     depends_on:
       - db
-
+    environment:
+      - DJANGO_SETTINGS_MODULE=devsearch.settings
   db:
     image: postgres:13
     volumes:
