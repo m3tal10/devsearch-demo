@@ -124,6 +124,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'devsearch.asgi.application'
 WSGI_APPLICATION = 'devsearch.wsgi.application'
 
 
@@ -218,7 +219,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 # AWS_STORAGE_BUCKET_NAME = 'devsearch-bucket'
 
-ASGI_APPLICATION = 'devsearch.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -227,5 +227,6 @@ CHANNEL_LAYERS = {
         }
     },
 }
+
 if os.getcwd() == '/app':
     DEBUG = False
