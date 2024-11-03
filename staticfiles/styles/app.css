@@ -20,11 +20,22 @@ img {
 }
 
 .content-box {
+  display: flex;
+  flex-direction: column;
   width: 95%;
   max-width: 85rem;
   margin: 0 auto;
+  height: 100%;
 }
-
+.content-box-chat {
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  max-width: 85rem;
+  margin: 0 auto;
+  height: 100%;
+  justify-content: end;
+}
 /*=======================
   Header Section
 ========================*/
@@ -779,6 +790,7 @@ img {
 .message__author,
 .message__date {
   flex-basis: 25%;
+  color: red;
 }
 
 .message__subject {
@@ -794,11 +806,68 @@ img {
 ========================*/
 
 .messagePage .message {
+  display: flex;
+  flex-direction: column;
   list-style: none;
   background: var(--color-white);
   padding: 3.5rem 5rem;
+  border-radius: 0.7rem;
+}
+.text-messages {
+  position: relative;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 1rem;
+  padding: 2rem;
+  background: url(../images/chatbg.png);
+  background-color: antiquewhite;
+}
+.message-date {
+  color: blue;
+}
+
+.message-body {
+  font-weight: bolder;
+  background: var(--color-white);
+  padding: 1rem 2.5rem;
+  border-radius: 10%;
+  max-width: 50%;
+}
+.messagePage {
+  height: 80vh;
+}
+.chat-form {
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  width: 100%;
+  background: var(--color-white);
   border: 2px solid var(--color-light);
   border-radius: 0.7rem;
+  border-left: none;
+  gap: 0.5rem;
+}
+.chat-message-submit {
+  height: 100%;
+  padding: 0.5rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.sender.message-div {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  justify-content: center;
+}
+.receiver.message-div {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
 }
 
 .messagePage .message__subject {
@@ -821,7 +890,8 @@ img {
 }
 
 .backButton {
-  background: var(--color-main-light);
+  position: fixed;
+  background: var(--color-white);
   color: var(--color-main);
   width: 4rem;
   height: 4rem;
