@@ -1,5 +1,5 @@
 # DevSearch
-#live-link: http://ec2-18-142-56-106.ap-southeast-1.compute.amazonaws.com/
+# live-link: http://ec2-18-142-56-106.ap-southeast-1.compute.amazonaws.com/
 # Installation
 - 1 - clone repo
 - 2 - create a virtual environment and activate
