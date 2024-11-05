@@ -25,9 +25,8 @@
                 {% endif %}
 
                 {% if project.demo_link %}
-                <a class="singleProject__liveLink" href="{{project.source_link}}" target="_blank"><i
+                <a class="singleProject__liveLink" href="{{project.demo_link}}" target="_blank"><i
                         class="im im-external-link"></i>Live Demo
-
                 </a>
                 {% endif %}
             </div>
@@ -73,7 +72,7 @@
                         {% if review.body %}
                         <div class="comment">
                             <a href="{% url 'user-profile' review.owner.id  %}">
-                                <img class="avatar avatar--md" src="{{review.owner.profile_image.url}}" alt="user" />
+                                <img class="avatar avatar--md" src="{{review.owner.profile_image}}" alt="user" />
                             </a>
 
 
